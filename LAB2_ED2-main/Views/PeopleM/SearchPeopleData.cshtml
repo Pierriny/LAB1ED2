@@ -1,0 +1,82 @@
+﻿@model LAB2_ED2.Models.PeopleModel
+@{
+    ViewData["Title"] = "SearchPeopleData";
+}
+
+<Html class="text-info">
+<h1 class="text-info">Búsqueda</h1>
+<body class="text-info">
+
+    <h4>Búsqueda por categoría</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <form asp-action="SearchPeopleData">
+                <div class="form-group">
+                    <label>Categoría: </label>&nbsp;
+                    <div>
+                        <select class="custom-select" aps-for="Variable" aps-validation-for="Variable" name="Variable" id="SelectID">
+                            <option id="Option1" value="0">Seleccione una opción</option>
+                            <option id="Option2" value="1">Nombre</option>
+                            <option id="Option3" value="2">DPI</option>
+                            <option id="Option4" value="3">DPI y Nombre</option>
+                        </select>
+                    </div>
+                </div>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group" id="LicenseSpace">
+                    <label asp-for="name" class="control-label"></label>
+                    <input asp-for="name" class="form-control" />
+                    <span asp-validation-for="name" class="text-danger"></span>
+                </div>
+                <div class="form-group" id="ColorSpace">
+                    <label asp-for="dpi" class="control-label"></label>
+                    <input asp-for="dpi" class="form-control" />
+                    <span asp-validation-for="dpi" class="text-danger"></span>
+                </div>
+                <div class="form-group" id="PropietarySpace">
+                    <label asp-for="name" class="control-label"></label>
+                    <input asp-for="name" class="form-control" />
+                    <span asp-validation-for="name" class="text-danger"></span>
+                    <label asp-for="dpi" class="control-label"></label>
+                    <input asp-for="dpi" class="form-control" />
+                    <span asp-validation-for="dpi" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <tr>
+                        <td>
+                            <input type="submit" value="Realizar Búsqueda" class="btn btn-outline-info" />
+                            <br></br>
+                            <p style="color:red"><strong>@ViewBag.Message</strong></p>
+                        </td>
+                    </tr>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <a asp-controller="PeopleM" asp-action="Index">Regresar a Inicio</a>
+    </div>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        <script>
+    $(document).ready(function(){
+            $("#SelectID").is(function(){
+                if (this.value == 0){$("#LicenseSpace").hide(); $("#ColorSpace").hide(); $("#PropietarySpace").hide(); $("#LatitudSpace").hide(); $("#LongitudSpace").hide();}
+            });
+            $("#SelectID").change(function(){
+                if (this.value == 0){$("#LicenseSpace").hide(); $("#ColorSpace").hide(); $("#PropietarySpace").hide(); $("#LatitudSpace").hide(); $("#LongitudSpace").hide();}
+                if (this.value == 1){$("#LicenseSpace").show(); $("#ColorSpace").hide(); $("#PropietarySpace").hide(); $("#LatitudSpace").hide(); $("#LongitudSpace").hide();}
+                if (this.value == 2){$("#LicenseSpace").hide(); $("#ColorSpace").show(); $("#PropietarySpace").hide(); $("#LatitudSpace").hide(); $("#LongitudSpace").hide();}
+                if (this.value == 3){$("#LicenseSpace").hide(); $("#ColorSpace").hide(); $("#PropietarySpace").show(); $("#LatitudSpace").hide(); $("#LongitudSpace").hide();}
+                if (this.value == 4){$("#LicenseSpace").hide(); $("#ColorSpace").hide(); $("#PropietarySpace").hide(); $("#LatitudSpace").show(); $("#LongitudSpace").show();}
+            });
+        });
+        </script>
+    }
+
+</body>
+</Html class="text-info>
+

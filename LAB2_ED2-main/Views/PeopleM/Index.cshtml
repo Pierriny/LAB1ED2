@@ -1,0 +1,39 @@
+﻿
+@{
+    ViewData["Title"] = "Administration Home";
+}
+
+<h1 class="text-info text-center"><font size="10" style="color:black" >Pagina de adminsitración de datos</font></h1>
+
+<html>
+<body>   
+    <center>
+    <label class="text-info"><font size="5" style="color:darkgreen" >Ingreso de datos a la base de datos</font></label>
+
+    <p></p>
+    
+    <a class="button text-info btn btn-outline-info" asp-controller="PeopleM" asp-action="UploadPeopleFile">Carga por Archivos</a>
+    <a class="button text-info btn btn-outline-info" asp-controller="PeopleM" asp-action="AddPeople">Ingreso Manual</a>
+    
+    <p></p>
+
+    <label class="text-info"><font size="5" style="color:darkgreen">Manipulacion con los datos</font></label>
+
+    <p></p>
+   
+         <a class="button text-info btn btn-outline-info" asp-controller="PeopleM" asp-action="SearchPeopleData">Realizar Búsqueda</a>
+    
+    <p></p>
+
+    <label class="text-info"><font size="5" style="color:darkgreen">Base de datos</font></label>
+
+    <p></p>
+    
+    <a class="button text-info btn btn-outline-info" asp-controller="PeopleM" asp-action="PeopleList">Ver base de datos</a>
+    
+    <p></p>
+
+  </center>
+</body>
+</html>
+

@@ -1,0 +1,53 @@
+﻿@model System.Collections.Generic.List<LAB2_ED2.Models.PeopleModel> //DataStructures.DoubleLinkedList<LAB2_ED2.Models.PeopleModel>
+
+@{
+    ViewData["Title"] = "ResultPeopleList";
+}
+
+<html class="text-info bg-dark">
+<body>
+    <h1 class="text-info">Resultados de la Búsqueda</h1>
+
+    @if (Model != null)
+    {
+        <table class="table text-info">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>DPI</th>
+                    <th>Fecha de nacimiento</th>
+                    <th>Dirección</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.dpi)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.datebirth)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.address)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Editar", "EditPeopleData", new { id = item.dpi }) |
+                            @Html.ActionLink("Detalles", "ViewPeopleData", new { id = item.dpi }) |
+                            @Html.ActionLink("Borrar", "DeletePeopleData", new { id = item.dpi })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    <p>
+        <a asp-controller="PeopleM" asp-action="Index">Regresar a Inicio</a>
+    </p>
+</body>
+</html>
+

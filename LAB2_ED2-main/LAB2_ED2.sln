@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LAB2_ED2", "LAB2_ED2.csproj", "{874DD881-EF66-4117-9EE5-577F1DDD0E94}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataStructures", "DataStructures\DataStructures.csproj", "{7535A9A2-429D-4959-B124-D231E4EFA69E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{874DD881-EF66-4117-9EE5-577F1DDD0E94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{874DD881-EF66-4117-9EE5-577F1DDD0E94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{874DD881-EF66-4117-9EE5-577F1DDD0E94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{874DD881-EF66-4117-9EE5-577F1DDD0E94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7535A9A2-429D-4959-B124-D231E4EFA69E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7535A9A2-429D-4959-B124-D231E4EFA69E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7535A9A2-429D-4959-B124-D231E4EFA69E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7535A9A2-429D-4959-B124-D231E4EFA69E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D5EE0D7A-D172-4D07-A7BE-3F22495EF23A}
+	EndGlobalSection
+EndGlobal

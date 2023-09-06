@@ -1,0 +1,61 @@
+﻿@model LAB2_ED2.Models.PeopleModel
+
+@{
+    ViewData["Title"] = "ViewDeCode";
+}
+
+<body>
+    <h1 class="text-info">Información</h1>
+    <div>
+        <h4 class="text-info">Datos</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2 text-info">
+                Nombre
+            </dt>
+            <dd class="col-sm-10 text-info">
+                @Html.DisplayFor(model => model.name)
+            </dd>
+            <dt class="col-sm-2 text-info">
+                DPI
+            </dt>
+            <dd class="col-sm-10 text-info">
+                @Html.DisplayFor(model => model.dpi)
+            </dd>
+            <dt class="col-sm-2 text-info">
+                Fecha de nacimiento
+            </dt>
+            <dd class="col-sm-10 text-info">
+                @Html.DisplayFor(model => model.datebirth)
+            </dd>
+            <dt class="col-sm-2 text-info">
+                Dirección
+            </dt>
+            <dd class="col-sm-10 text-info">
+                @Html.DisplayFor(model => model.address)
+            </dd>
+            <dt class="col-sm-2 text-info">
+                Companias
+            </dt>
+            <dd class="col-sm-10 text-info">
+
+            </dd>
+
+           
+        </dl>
+    </div>
+</body>
+
+
+
+<div>
+    @if (Model != null)
+    {
+        @Html.ActionLink("Editar", "EditPeopleData", new { id = Model.dpi }) <line>|</line>
+        @Html.ActionLink("Borrar", "DeletePeopleData", new { id = Model.dpi }) <line>|</line>
+        @Html.ActionLink("Regresar a la Detalles", "ViewPeopleData", new { id = Model.dpi }) <line>|</line>
+        @Html.ActionLink("Codificar", "ViewEncodeDPI", new { id = Model.dpi })
+    }
+    <a asp-controller="PeopleM" asp-action="Index">Regresar a Inicio</a>
+</div>
+

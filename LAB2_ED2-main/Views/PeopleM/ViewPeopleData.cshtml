@@ -1,0 +1,52 @@
+﻿@model LAB2_ED2.Models.PeopleModel
+
+@{
+    ViewData["Title"] = "ViewPeopleData";
+}
+
+<body>
+    <h1 class="text-info"><font color=" black">Perfil del cliente</font></h1>
+    <div>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2 text-info">
+                Nombre
+            </dt>
+            <dd class="col-sm-10 text-info ">
+                @Html.DisplayFor(model => model.name)
+            </dd>
+            <dt class="col-sm-2 text-info">
+                DPI
+            </dt>
+            <dd class="col-sm-10 text-info">
+                @Html.DisplayFor(model => model.dpi)
+            </dd>
+            <dt class="col-sm-2 text-info">
+                Fecha de nacimiento
+            </dt>
+            <dd class="col-sm-10 text-info">
+                @Html.DisplayFor(model => model.datebirth)
+            </dd>
+            <dt class="col-sm-2 text-info">
+                Dirección
+            </dt>
+            <dd class="col-sm-10 text-info">
+                @Html.DisplayFor(model => model.address)
+            </dd>
+            <dd class="col-sm-10 text-info">
+
+            </dd>
+        </dl>
+    </div>
+</body>
+
+
+
+<div>
+    @if (Model != null)
+    {
+        @Html.ActionLink("Editar", "EditPeopleData", new { id = Model.dpi }) <line>|</line>
+        @Html.ActionLink("Borrar", "DeletePeopleData", new { id = Model.dpi }) <line>|</line>
+    }
+    <a asp-controller="PeopleM" asp-action="Index">Regresar a Inicio</a>
+</div>

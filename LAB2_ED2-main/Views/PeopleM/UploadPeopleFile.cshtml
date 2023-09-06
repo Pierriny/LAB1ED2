@@ -1,0 +1,37 @@
+﻿
+@{
+    ViewData["Title"] = "UploadPeopleFile";
+}
+
+<html class="text-info">
+<h1 class="text-info">Cargar Archivo</h1>
+<label style="color:red">Nota: este programa esta pensado para recivir archivos de tipo Json</label>
+<p class="text-info">Seleccione el archivo que desea cargar</p>
+<body>
+    <form asp-controller="PeopleM" method="post" enctype="multipart/form-data">
+        <div class="custom-file">
+            <input class="form-control custom-file-input text-info" type="file" name="FILE">
+            <label class="custom-file-label text-info">Seleccionar Archivo...</label>
+            <br><br />
+            <table>
+                <tr>
+                    <td>
+                        <input asp-action="UploadPeopleFile" type="submit" value="Cargar Archivo" class="btn btn-outline-info" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</body>
+</html>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.custom-file-input').on("change", function() {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            });
+        });
+    </script>
+}

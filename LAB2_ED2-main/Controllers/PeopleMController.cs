@@ -4,12 +4,30 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Text.Json;
+using System.IO;
 
 namespace LAB2_ED2.Controllers
 {
     public class PeopleMController : Controller
     {
+
+       
+
         
+        /*
+        public static void EscribeEnArchivo(string contenido)
+        {
+            string rutaArchivo = "C:\\Users\\hanse\\Documents\\2023\\2023segundociclo\\Esctructura de datos II\\Laboratorio\\Laboratorio1\\LAB1ED2\\LAB2_ED2-main\\Files\\Bitacora.txt";
+            bool sobrescribir = true;
+            StreamWriter sw = new StreamWriter(rutaArchivo, !sobrescribir);
+            sw.Write(contenido);
+            sw.Close();
+
+        }
+        */
+
+
+
         public IActionResult Index()
         {
             return View();
@@ -141,23 +159,6 @@ namespace LAB2_ED2.Controllers
             return View(LAB2_ED2.Models.Singleton.Instance.SearchedItem);
         }
 
-        public IActionResult ViewEncodeLZ78(string? id)
-        {
-            if (id != null)
-            {
-                SearchAndSave(id);
-            }
-            return View(LAB2_ED2.Models.Singleton.Instance.SearchedItem);
-        }
-
-        public IActionResult ViewDecodeLZ78(string? id)
-        {
-            if (id != null)
-            {
-                SearchAndSave(id);
-            }
-            return View(LAB2_ED2.Models.Singleton.Instance.SearchedItem);
-        }
 
         public IActionResult ResultPeopleList()
         {
@@ -180,6 +181,13 @@ namespace LAB2_ED2.Controllers
         [HttpPost]
         public IActionResult SearchPeopleData(Microsoft.AspNetCore.Http.IFormCollection IncomeData)
         {
+            string rutaArchivo = "C:\\Users\\hanse\\Documents\\2023\\2023segundociclo\\Esctructura de datos II\\Laboratorio\\Laboratorio1\\LAB1ED2\\LAB2_ED2-main\\Files\\Bitacora.txt";
+            bool sobrescribir = false;
+
+            DateTime thisDay = DateTime.Today;
+
+            StreamWriter sw = new StreamWriter(rutaArchivo, !sobrescribir);
+
             var DataToSearch = new LAB2_ED2.Models.PeopleModel();
             LAB2_ED2.Models.PeopleModel? UniqueResult = null;
             System.Collections.Generic.List<LAB2_ED2.Models.PeopleModel> Lista = LAB2_ED2.Models.Singleton.Instance.AVLTree.ToList();
@@ -190,15 +198,30 @@ namespace LAB2_ED2.Controllers
                 case 1:
                     DataToSearch.name = IncomeData["name"];
                     LAB2_ED2.Models.Singleton.Instance.SearchedItems = Lista.FindAll(x => x.name.ToUpper() == DataToSearch.name.ToUpper());
+
+                    
+                   
+                    sw.Write("Se  realizado una busqueda por Nombre " + IncomeData["name"] + " el dia: " + thisDay.ToLongDateString() + " \n");
+                    sw.Close();
+
                     break;
                 case 2:
                     DataToSearch.dpi = Convert.ToInt64((IncomeData["dpi"]));
                     LAB2_ED2.Models.Singleton.Instance.SearchedItems = Lista.FindAll(x => x.dpi.ToString() == DataToSearch.dpi.ToString());
+
+                 
+                    sw.Write("Se  realizado una busqueda por DPI " + Convert.ToInt64((IncomeData["dpi"])) + " el dia: " + thisDay.ToLongDateString() + " \n");
+                    sw.Close();
+
                     break;
                 default:
                     DataToSearch.name = IncomeData["name"];
                     DataToSearch.dpi = Convert.ToInt64(IncomeData["dpi"]);
                     LAB2_ED2.Models.Singleton.Instance.SearchedItems = Lista.FindAll(x => x.name.ToUpper() == DataToSearch.name.ToUpper() && x.dpi.ToString() == DataToSearch.dpi.ToString());
+                   
+                    sw.Write("Se  realizado una busqueda por Nombre " + IncomeData["name"] + " y DPI " + Convert.ToInt64(IncomeData["dpi"]) + " el dia: " + thisDay.ToLongDateString() + " \n");
+                    sw.Close();
+
                     break;
             }
 

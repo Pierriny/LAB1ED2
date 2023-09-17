@@ -9,7 +9,8 @@ namespace LAB2_ED2.Models
     {
         public readonly DataStructures.AVLTree<PeopleModel> AVLTree;
         public readonly DataStructures.DoubleLinkedList<CodeModel> CodArray;
-        
+        public readonly DataStructures.DoubleLinkedList<AlgoritmoLZ78> LZ78Array;
+
         public int RotationCount;
         public int CompararisonCount;
         public System.Collections.Generic.List<PeopleModel>? SearchedItems;
@@ -19,7 +20,8 @@ namespace LAB2_ED2.Models
         {
             AVLTree = new DataStructures.AVLTree<PeopleModel>();
             CodArray = new DataStructures.DoubleLinkedList<CodeModel>();
-          
+            LZ78Array = new DataStructures.DoubleLinkedList<AlgoritmoLZ78>();
+
             RotationCount = 0;
             CompararisonCount = 0;
         }

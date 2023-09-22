@@ -1,7 +1,7 @@
 ﻿@model LAB2_ED2.Models.PeopleModel
 
 @{
-    ViewData["Title"] = "ViewEncodeDPI";
+    ViewData["Title"] = "ViewEncodeLZ78";
 }
 
 <body>
@@ -41,7 +41,30 @@
 
             </dd>
 
-           
+            @{
+                int CountComp = 0;
+                foreach (var Company in Model.companies)
+                {
+                    <dd class="col-sm-10 text-info">
+                        @Company
+                    </dd>
+
+                    int CountC2 = 0;
+                    foreach (var Coded in Model.EncodeLZ78)
+                    {
+                        if (CountComp == CountC2)
+                        {
+                            <dd class="col-sm-10 table-warning">
+                                @Coded
+                            </dd>
+
+                        }
+                        CountC2++;
+                    }
+                    CountComp++;
+
+                }
+            }
         </dl>
     </div>
 </body>
@@ -53,8 +76,8 @@
     {
         @Html.ActionLink("Editar", "EditPeopleData", new { id = Model.dpi }) <line>|</line>
         @Html.ActionLink("Borrar", "DeletePeopleData", new { id = Model.dpi }) <line>|</line>
-        @Html.ActionLink("Regresar a la Detalles", "ViewPeopleData", new { id = Model.dpi }) <line>|</line>
-        @Html.ActionLink("Decodificar", "ViewDeCode", new { id = Model.dpi })<line>|</line>
+        @Html.ActionLink("Detalles", "ViewPeopleData", new { id = Model.dpi }) <line>|</line>
+        @Html.ActionLink("Decodificar LZ78", "ViewDecodeLZ78", new { id = Model.dpi })<line>|</line>
     }
     <a asp-controller="PeopleM" asp-action="Index">Regresar a Inicio</a>
 </div>

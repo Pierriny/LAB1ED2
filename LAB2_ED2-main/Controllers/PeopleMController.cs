@@ -11,23 +11,6 @@ namespace LAB2_ED2.Controllers
     public class PeopleMController : Controller
     {
 
-       
-
-        
-        /*
-        public static void EscribeEnArchivo(string contenido)
-        {
-            string rutaArchivo = "C:\\Users\\hanse\\Documents\\2023\\2023segundociclo\\Esctructura de datos II\\Laboratorio\\Laboratorio1\\LAB1ED2\\LAB2_ED2-main\\Files\\Bitacora.txt";
-            bool sobrescribir = true;
-            StreamWriter sw = new StreamWriter(rutaArchivo, !sobrescribir);
-            sw.Write(contenido);
-            sw.Close();
-
-        }
-        */
-
-
-
         public IActionResult Index()
         {
             return View();
@@ -44,6 +27,125 @@ namespace LAB2_ED2.Controllers
         }
 
 
+
+        public void AlgLZ78(PeopleModel ObjTodec)
+        {
+            String MessageToDec = "";
+            String CodifAlgLZ78 = "";
+            String DecodifAlgLZ78 = "";
+            var NodePosition = LAB2_ED2.Models.Singleton.Instance.LZ78Array.Head;
+            var ActualNode = LAB2_ED2.Models.Singleton.Instance.LZ78Array.Head;
+            foreach (var Compani in ObjTodec.companies)
+            {
+                LAB2_ED2.Models.Singleton.Instance.LZ78Array.Clear();
+                MessageToDec = Compani + Convert.ToString(ObjTodec.dpi);
+                int IndexCount = 1;
+                bool JumpSymbol = false;
+                AlgoritmoLZ78 NodeLZ78 = new AlgoritmoLZ78();
+                bool Jump = false;
+                int CountMessage = 0;
+                foreach (var symbol in MessageToDec)
+                {
+                    if (JumpSymbol == true)
+                    {
+                        NodeLZ78.Entry = NodeLZ78.Entry + Convert.ToString(symbol);
+                        int CountTempSyT = 0;
+                        ActualNode = LAB2_ED2.Models.Singleton.Instance.LZ78Array.Head;
+                        while (CountTempSyT < LAB2_ED2.Models.Singleton.Instance.LZ78Array.Count() - 1 && ActualNode.Value.Entry != NodeLZ78.Entry)
+                        {
+                            ActualNode = ActualNode.Two;
+                            CountTempSyT++;
+                        }
+
+                        if (ActualNode.Value.Entry == NodeLZ78.Entry)
+                        {
+                            NodeLZ78.Codigo = Convert.ToString(ActualNode.Value.Indice) + ">";
+                            JumpSymbol = true;
+                        }
+                        else
+                        {
+                            NodeLZ78.Codigo = NodeLZ78.Codigo + Convert.ToString(symbol);
+                            LAB2_ED2.Models.Singleton.Instance.LZ78Array.Insert(NodeLZ78);
+                            JumpSymbol = false;
+                        }
+                    }
+                    else
+                    {
+                        if (LAB2_ED2.Models.Singleton.Instance.LZ78Array.Count() == 0)
+                        {
+                            NodeLZ78 = new AlgoritmoLZ78();
+                            NodeLZ78.Indice = IndexCount;
+                            NodeLZ78.Codigo = "0," + symbol;
+                            NodeLZ78.Entry = Convert.ToString(symbol);
+                            LAB2_ED2.Models.Singleton.Instance.LZ78Array.Insert(NodeLZ78);
+                            JumpSymbol = false;
+                        }
+                        else
+                        {
+                            CountMessage = 0;
+                            ActualNode = LAB2_ED2.Models.Singleton.Instance.LZ78Array.Head;
+                            NodePosition = LAB2_ED2.Models.Singleton.Instance.LZ78Array.Head;
+                            bool NewSymbol = true;
+
+                            do
+                            {
+                                if (ActualNode.Value.Entry == Convert.ToString(symbol))
+                                {
+                                    NewSymbol = false;
+                                    NodePosition = ActualNode;//Guarda la primera coincidencia encontrada
+                                }
+
+                                if (ActualNode.Two != null)
+                                {
+                                    ActualNode = ActualNode.Two;
+                                }
+                                CountMessage++;
+                            } while (CountMessage < LAB2_ED2.Models.Singleton.Instance.LZ78Array.Count() && NewSymbol == true);
+
+                            if (NewSymbol == true)
+                            {
+                                NodeLZ78 = new AlgoritmoLZ78();
+                                IndexCount++;
+                                NodeLZ78.Indice = IndexCount;
+                                NodeLZ78.Codigo = "0," + symbol;
+                                NodeLZ78.Entry = Convert.ToString(symbol);
+                                LAB2_ED2.Models.Singleton.Instance.LZ78Array.Insert(NodeLZ78);
+                            }
+                            else
+                            {
+                                NodeLZ78 = new AlgoritmoLZ78();
+                                IndexCount++;
+                                NodeLZ78.Indice = IndexCount;
+                                NodeLZ78.Codigo = Convert.ToString(NodePosition.Value.Indice) + ",";
+                                NodeLZ78.Entry = NodePosition.Value.Entry;
+                                JumpSymbol = true;
+                            }
+                        }
+                    }
+                }
+
+                foreach (var item in LAB2_ED2.Models.Singleton.Instance.LZ78Array)
+                {
+                    CodifAlgLZ78 = CodifAlgLZ78 + "<" + item.Codigo + ">";
+                    DecodifAlgLZ78 = DecodifAlgLZ78 + item.Entry;
+                }
+                CodifAlgLZ78 = CodifAlgLZ78 + "{";
+                DecodifAlgLZ78 = DecodifAlgLZ78 + "{";
+            }
+            String[] DataSplitCodifAlgLZ78 = CodifAlgLZ78.Split('{');
+            String[] DataSplitDecodifAlgLZ78 = DecodifAlgLZ78.Split('{');
+
+            ObjTodec.EncodeLZ78 = DataSplitCodifAlgLZ78;
+            ObjTodec.DecodeLZ78 = DataSplitDecodifAlgLZ78;
+        }
+
+
+
+       
+
+
+
+
         [HttpPost]
         public IActionResult AddPeople(IFormCollection IncomeData)
         {
@@ -52,8 +154,8 @@ namespace LAB2_ED2.Controllers
             NewData.dpi = Convert.ToInt64(IncomeData["dpi"]);
             NewData.datebirth = Convert.ToDateTime(IncomeData["datebirth"]);
             NewData.address = IncomeData["address"];
-            
-          
+            NewData.companies = IncomeData["companies"];
+
             Singleton.Instance.AVLTree.Add(NewData, Models.Delegates.DPIComparison);
             return View("/Views/Home/Index.cshtml");
         }
@@ -92,13 +194,13 @@ namespace LAB2_ED2.Controllers
                             DataJs.dpi = Convert.ToInt64(jsonString.dpi);
                             DataJs.datebirth = Convert.ToDateTime(jsonString.datebirth);
                             DataJs.address = jsonString.address;
-                           
+                            DataJs.companies = jsonString.companies;
 
 
 
                             if (action[0] == "INSERT")
-                            {
-                                
+                            {                            
+                                AlgLZ78(DataJs);// Para codificar LZ78
                                 LAB2_ED2.Models.Singleton.Instance.AVLTree.Add(DataJs, LAB2_ED2.Models.Delegates.DPIComparison);
                             }
                             else if (action[0] == "DELETE")
@@ -121,6 +223,9 @@ namespace LAB2_ED2.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+
+
         private void SearchAndSave(string? id)
         {
             var DataToSearch = new LAB2_ED2.Models.PeopleModel();
@@ -141,7 +246,7 @@ namespace LAB2_ED2.Controllers
             return View(LAB2_ED2.Models.Singleton.Instance.SearchedItem);
         }
 
-        public IActionResult ViewDeCode(string? id)
+        public IActionResult ViewEncodeLZ78(string? id)
         {
             if (id != null)
             {
@@ -150,7 +255,7 @@ namespace LAB2_ED2.Controllers
             return View(LAB2_ED2.Models.Singleton.Instance.SearchedItem);
         }
 
-        public IActionResult ViewEncodeDPI(string? id)
+        public IActionResult ViewDecodeLZ78(string? id)
         {
             if (id != null)
             {

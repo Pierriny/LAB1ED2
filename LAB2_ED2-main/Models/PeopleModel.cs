@@ -33,8 +33,29 @@ namespace LAB2_ED2.Models
         [RegularExpression(@"^[a-zA-ZÀ-ÿ\u00f1\u00d1'´'-'\s]{1,20}$", ErrorMessage = "Cáracteres Inválidos.")]
         public string address { get; set; }
 
+        [Required(ErrorMessage = "El campo de las companias es requerido.")]
+        [Display(Name = "companies")]
+        [MaxLength(25)]
+        [RegularExpression(@"^[a-zA-ZÀ-ÿ\u00f1\u00d1'´'-'\s]{1,20}$", ErrorMessage = "Cáracteres Inválidos.")]
+        public String[] companies { get; set; }
+
         public string[] Symbol { get; set; }
 
+        public String[] FrequencyP { get; set; }
+
+        public String[] Probability { get; set; }
+        public String[] RangeP { get; set; }
+
+        public String[] Inferior { get; set; }
+
+        public String[] Superior { get; set; }
+
+
+        public String[] Encode { get; set; }
+        public String[] Decode { get; set; }
+
+        public String[] EncodeLZ78 { get; set; }
+        public String[] DecodeLZ78 { get; set; }
 
     }
 }

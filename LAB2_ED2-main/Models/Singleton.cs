@@ -21,7 +21,6 @@ namespace LAB2_ED2.Models
             AVLTree = new DataStructures.AVLTree<PeopleModel>();
             CodArray = new DataStructures.DoubleLinkedList<CodeModel>();
             LZ78Array = new DataStructures.DoubleLinkedList<AlgoritmoLZ78>();
-
             RotationCount = 0;
             CompararisonCount = 0;
         }

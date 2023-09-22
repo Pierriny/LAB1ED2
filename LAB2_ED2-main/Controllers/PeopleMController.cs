@@ -319,15 +319,6 @@ namespace LAB2_ED2.Controllers
                     sw.Close();
 
                     break;
-                default:
-                    DataToSearch.name = IncomeData["name"];
-                    DataToSearch.dpi = Convert.ToInt64(IncomeData["dpi"]);
-                    LAB2_ED2.Models.Singleton.Instance.SearchedItems = Lista.FindAll(x => x.name.ToUpper() == DataToSearch.name.ToUpper() && x.dpi.ToString() == DataToSearch.dpi.ToString());
-                   
-                    sw.Write("Se  realizado una busqueda por Nombre " + IncomeData["name"] + " y DPI " + Convert.ToInt64(IncomeData["dpi"]) + " el dia: " + thisDay.ToLongDateString() + " \n");
-                    sw.Close();
-
-                    break;
             }
 
             

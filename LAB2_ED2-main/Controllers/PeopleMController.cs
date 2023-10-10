@@ -5,6 +5,8 @@ using System;
 using System.Linq;
 using System.Text.Json;
 using System.IO;
+using System.Text;
+using System.Reflection.Emit;
 
 namespace LAB2_ED2.Controllers
 {
@@ -14,17 +16,17 @@ namespace LAB2_ED2.Controllers
         public IActionResult Index()
         {
             return View();
-        }
+        } 
 
         public IActionResult PeopleList()
         {
             return View(LAB2_ED2.Models.Singleton.Instance.AVLTree);
-        }
+        } 
 
-        public IActionResult AddPeople()
+        public IActionResult AddPeople() 
         {
             return View();
-        }
+        }  
 
 
 
@@ -141,7 +143,7 @@ namespace LAB2_ED2.Controllers
 
 
 
-       
+
 
 
 
@@ -201,6 +203,8 @@ namespace LAB2_ED2.Controllers
                             if (action[0] == "INSERT")
                             {                            
                                 AlgLZ78(DataJs);// Para codificar LZ78
+                                SearchFilesToCod(Convert.ToString(DataJs.dpi));// cifrar cartas
+                                SearchFilesToDecs(Convert.ToString(DataJs.dpi));// decifrar cartas
                                 LAB2_ED2.Models.Singleton.Instance.AVLTree.Add(DataJs, LAB2_ED2.Models.Delegates.DPIComparison);
                             }
                             else if (action[0] == "DELETE")
@@ -394,6 +398,214 @@ namespace LAB2_ED2.Controllers
                 }
             }
         }
+
+
+
+
+
+
+
+
+
+        //--------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+        /*
+        public string InvertirTexto(string texto)
+        {
+            char[] caracteres = texto.ToCharArray();
+            Array.Reverse(caracteres);
+            return new string(caracteres);
+        }
+        */
+
+        static string LeerArchivoATexto(string ruta)
+        {
+            // Usar StreamReader para leer el contenido del archivo
+            using (StreamReader reader = new StreamReader(ruta))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
+
+        static void CrearYGuardarArchivo(string ruta, string nombreArchivo, string contenido)
+        {
+            // Combina la ruta y el nombre del archivo
+            string rutaCompleta = Path.Combine(ruta, nombreArchivo);
+
+            // Usar StreamWriter para escribir el contenido en el archivo
+            using (StreamWriter writer = new StreamWriter(rutaCompleta))
+            {
+                writer.Write(contenido);
+            }
+        }
+
+
+        public void SearchFilesToCod(String DpiToSearch)
+        {
+            bool Cycle = true;
+            int NumCard = 1;
+            int clave = 3; //Numero de posiciones para transponer
+            string contenido;
+            
+            string Ruta = @"C:\Users\hanse\Documents\2023\2023segundociclo\Esctructura de datos II\Laboratorio\Laboratorio1\LAB1ED2\LAB2_ED2-main\Files\CartasCifradas\";
+            while (Cycle == true)
+            {
+                try
+                {
+                    DirectoryInfo TempPath = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                    TempPath = TempPath.Parent.Parent.Parent;
+                    string PathString = Convert.ToString(TempPath);
+
+                    string archivo = System.IO.Path.Combine(PathString, "Files", "inputs", "REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
+
+                    contenido = LeerArchivoATexto(archivo);
+
+                    string nombreN = "compressed-REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt";
+
+                    CrearYGuardarArchivo(Ruta, nombreN, CodificarTransposicionSimple(contenido, clave));
+
+
+                    /*
+                    DirectoryInfo TempPath = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                    TempPath = TempPath.Parent.Parent.Parent;
+                    string PathString = Convert.ToString(TempPath);
+                    string Route = System.IO.Path.Combine(PathString, "Files", "inputs", "REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
+                    string Route2 = System.IO.Path.Combine(PathString, "Files", "CartasCodificadas", "compressed-REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
+                    string FileData = System.IO.File.ReadAllText(Route);
+                    using (StreamWriter OutputFile = new StreamWriter(Route2))
+                    {
+                        OutputFile.WriteLine(CodificarTransposicionSimple(FileData,clave));//Message Coded save
+                    }
+                    */
+
+
+
+                }
+                catch (FileNotFoundException)
+                {
+                    Cycle = false;
+                }
+                catch (Exception e)
+                {
+                    Cycle = false;
+                }
+                NumCard++;
+            }
+        }
+
+
+
+
+        public void SearchFilesToDecs(String DpiToSearch)
+        {
+            bool Cycle = true;
+            int NumCard = 1;
+            int clave2 = 3;
+            string contenido2;
+            string Ruta2 = @"C:\Users\hanse\Documents\2023\2023segundociclo\Esctructura de datos II\Laboratorio\Laboratorio1\LAB1ED2\LAB2_ED2-main\Files\CartasDecifradas";
+            while (Cycle == true)
+            {
+                try
+                {
+                    DirectoryInfo TempPath = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                    TempPath = TempPath.Parent.Parent.Parent;
+                    string PathString = Convert.ToString(TempPath);
+
+                    string archivo = System.IO.Path.Combine(PathString, "Files", "CartasCifradas", "compressed-REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
+
+                    contenido2 = LeerArchivoATexto(archivo);
+
+                    string nombreN2 = "Decode - REC - " + Convert.ToString(DpiToSearch) + " - " + Convert.ToString(NumCard) + ".txt";
+
+                    CrearYGuardarArchivo(Ruta2, nombreN2, DecodificarTransposicionSimple(contenido2, clave2));
+
+
+                    /*
+
+                    DirectoryInfo TempPath = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                    TempPath = TempPath.Parent.Parent.Parent;
+                    string PathString = Convert.ToString(TempPath);
+                    string Route = System.IO.Path.Combine(PathString, "Files", "CartasCodificadas", "compressed-REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
+                    string Route2 = System.IO.Path.Combine(PathString, "Files", "CartasDecodificadas", "Decode-REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
+                    string FileData = System.IO.File.ReadAllText(Route);
+                    using (StreamWriter OutputFile = new StreamWriter(Route2))
+                    {
+                        OutputFile.WriteLine(DecodificarTransposicionSimple(FileData, clave2));
+                    }
+
+                    */
+
+                }
+                catch (FileNotFoundException)
+                {
+                    Cycle = false;
+                }
+                catch (Exception e)
+                {
+                    Cycle = false;
+                }
+
+                NumCard++;
+            }
+
+        }
+
+
+
+
+
+
+
+        static string CodificarTransposicionSimple(string texto, int clave)
+        {
+            char[] caracteres = texto.ToCharArray();
+            StringBuilder resultado = new StringBuilder();
+
+            for (int i = 0; i < caracteres.Length; i++)
+            {
+                if (char.IsLetter(caracteres[i]))
+                {
+                    char letra = caracteres[i];
+                    char nuevaLetra = (char)(letra + clave);
+
+                    if (char.IsUpper(letra) && nuevaLetra > 'Z')
+                    {
+                        nuevaLetra = (char)(nuevaLetra - 26);
+                    }
+                    else if (char.IsLower(letra) && nuevaLetra > 'z')
+                    {
+                        nuevaLetra = (char)(nuevaLetra - 26);
+                    }
+
+                    resultado.Append(nuevaLetra);
+                }
+                else
+                {
+                    resultado.Append(caracteres[i]);
+                }
+            }
+
+            return resultado.ToString();
+        }
+
+
+
+        static string DecodificarTransposicionSimple(string textoCodificado, int clave)
+        {
+            // La decodificación es el proceso inverso de la codificación
+            return CodificarTransposicionSimple(textoCodificado, -clave);
+        }
+
+
 
 
     }

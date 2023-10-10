@@ -16,7 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Files\" />
+    <Folder Include="Files\CartasCifradas\" />
+    <Folder Include="Files\CartasDecifradas\" />
   </ItemGroup>
 
   <ItemGroup>

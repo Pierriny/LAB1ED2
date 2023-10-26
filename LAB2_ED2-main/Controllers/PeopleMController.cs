@@ -7,6 +7,11 @@ using System.Text.Json;
 using System.IO;
 using System.Text;
 using System.Reflection.Emit;
+using System.Security.Cryptography;
+using System.Security.Policy;
+using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
+using System.Runtime.Intrinsics.X86;
 
 namespace LAB2_ED2.Controllers
 {
@@ -27,8 +32,6 @@ namespace LAB2_ED2.Controllers
         {
             return View();
         }  
-
-
 
         public void AlgLZ78(PeopleModel ObjTodec)
         {
@@ -142,12 +145,6 @@ namespace LAB2_ED2.Controllers
         }
 
 
-
-
-
-
-
-
         [HttpPost]
         public IActionResult AddPeople(IFormCollection IncomeData)
         {
@@ -167,6 +164,7 @@ namespace LAB2_ED2.Controllers
             return View();
         }
 
+
         [HttpPost]
         public IActionResult UploadPeopleFile(Microsoft.AspNetCore.Http.IFormFile FILE)
         {
@@ -174,6 +172,29 @@ namespace LAB2_ED2.Controllers
             {
                 try
                 {
+
+                    BigInteger PrimoP, PrimoQ, CoprimoK, N, Z, K;
+
+                    PrimoP = GenerarNumeroPrimo(64);
+
+                    PrimoQ = GenerarNumeroPrimo(64);
+
+                    //clave publica 1
+                    N = PrimoP * PrimoQ;
+
+                    Z = (PrimoP - 1) * (PrimoQ - 1);
+
+                    //clave publica 2
+                    K = GenerarNumeroCoprimo(Z);
+
+                    BigInteger[] result = ExtEuclid(K, Z);
+
+                    //clave privada
+                    BigInteger J = result[0];
+
+                    GuardarLLAVE(N, K, J);
+
+
                     string Route = System.IO.Path.Combine(System.IO.Path.GetTempPath(), FILE.Name);
                     using (var Stream = new System.IO.FileStream(Route, System.IO.FileMode.Create))
                     {
@@ -203,8 +224,16 @@ namespace LAB2_ED2.Controllers
                             if (action[0] == "INSERT")
                             {                            
                                 AlgLZ78(DataJs);// Para codificar LZ78
+
                                 SearchFilesToCod(Convert.ToString(DataJs.dpi));// cifrar cartas
+
                                 SearchFilesToDecs(Convert.ToString(DataJs.dpi));// decifrar cartas
+
+                                Conversaciones(Convert.ToString(DataJs.dpi), N, K, J);
+
+
+
+
                                 LAB2_ED2.Models.Singleton.Instance.AVLTree.Add(DataJs, LAB2_ED2.Models.Delegates.DPIComparison);
                             }
                             else if (action[0] == "DELETE")
@@ -226,9 +255,6 @@ namespace LAB2_ED2.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-
-
-
 
         private void SearchAndSave(string? id)
         {
@@ -267,7 +293,6 @@ namespace LAB2_ED2.Controllers
             }
             return View(LAB2_ED2.Models.Singleton.Instance.SearchedItem);
         }
-
 
         public IActionResult ResultPeopleList()
         {
@@ -325,7 +350,109 @@ namespace LAB2_ED2.Controllers
                     break;
             }
 
-            
+
+            bool Cycle = true;
+
+            int NumCard = 1;
+
+            string contenidoDECIFRADO;
+
+            DirectoryInfo TempPath2 = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+
+            TempPath2 = TempPath2.Parent.Parent.Parent;
+
+            string PathString2 = Convert.ToString(TempPath2);
+
+            string LLAVE1 = System.IO.Path.Combine(PathString2, "Files", "Llaves", "publicaN.txt");
+
+            string LLAVE2 = System.IO.Path.Combine(PathString2, "Files", "Llaves", "publicaK.txt");
+
+            string LLAVE3 = System.IO.Path.Combine(PathString2, "Files", "Llaves", "publicaJ.txt");
+
+            string N = LeerArchivoATexto(LLAVE1);
+
+            string K = LeerArchivoATexto(LLAVE2);
+
+            string J = LeerArchivoATexto(LLAVE3);
+
+            BigInteger claveN;
+            BigInteger.TryParse(N, out claveN);
+
+            BigInteger claveK;
+            BigInteger.TryParse(K, out claveK);
+
+            BigInteger claveJ;
+            BigInteger.TryParse(J, out claveJ);
+
+            string ValidacionCONV;
+
+            string Ruta = @"C:\Users\hanse\Documents\2023\2023segundociclo\Esctructura de datos II\Laboratorio\Laboratorio1\LAB1ED2\LAB2_ED2-main\Files\Validacion\";
+
+            while (Cycle == true)
+            {
+                try
+                {
+                    DirectoryInfo TempPath = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                    TempPath = TempPath.Parent.Parent.Parent;
+                    string PathString = Convert.ToString(TempPath);
+
+                    string archivoDecifrado = System.IO.Path.Combine(PathString, "Files", "CartasDecifradas", "decifradaCONV-" + Convert.ToString((IncomeData["dpi"])) + "-" + Convert.ToString(NumCard) + ".txt");
+
+                    contenidoDECIFRADO = LeerArchivoATexto(archivoDecifrado);
+
+                    string Hash = System.IO.Path.Combine(PathString, "Files", "HASHoriginal", "HASH-CONV-" + Convert.ToString((IncomeData["dpi"])) + "-" + Convert.ToString(NumCard) + ".txt");
+
+                    string HashCONV = LeerArchivoATexto(Hash);
+
+                    string HASHdecifrada = CalculateSHA256Hash(contenidoDECIFRADO);
+
+                    if (HashCONV == HASHdecifrada)
+                    {
+                        string validacion = "Valida";
+
+                        ValidacionCONV = "VALIDACION-CONV-" + Convert.ToString((IncomeData["dpi"])) + "-" + Convert.ToString(NumCard) + ".txt";
+
+                        CrearYGuardarArchivo(Ruta, ValidacionCONV, validacion);
+                    }
+                    else
+                    {
+                        string validacion = "MO Valida";
+
+                        ValidacionCONV = "VALIDACION-CONV-" + Convert.ToString((IncomeData["dpi"])) + "-" + Convert.ToString(NumCard) + ".txt";
+
+                        CrearYGuardarArchivo(Ruta, ValidacionCONV, validacion);
+
+                    }
+
+
+
+
+
+                }
+                catch (FileNotFoundException)
+                {
+                    Cycle = false;
+                }
+                catch (Exception e)
+                {
+                    Cycle = false;
+                }
+                NumCard++;
+            }
+
+           
+
+    
+
+
+
+
+
+
+
+
+
+
             if (UniqueResult == null && LAB2_ED2.Models.Singleton.Instance.SearchedItems.Count == 0)
             {
                 ViewBag.Message = "No se encontraron coincidencias.";
@@ -401,30 +528,9 @@ namespace LAB2_ED2.Controllers
 
 
 
-
-
-
-
-
-
         //--------------------------------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-        /*
-        public string InvertirTexto(string texto)
-        {
-            char[] caracteres = texto.ToCharArray();
-            Array.Reverse(caracteres);
-            return new string(caracteres);
-        }
-        */
 
         static string LeerArchivoATexto(string ruta)
         {
@@ -465,29 +571,13 @@ namespace LAB2_ED2.Controllers
                     TempPath = TempPath.Parent.Parent.Parent;
                     string PathString = Convert.ToString(TempPath);
 
-                    string archivo = System.IO.Path.Combine(PathString, "Files", "inputs", "REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
+                    string archivo = System.IO.Path.Combine(PathString, "Files", "inputsCONV", "CONV-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
 
                     contenido = LeerArchivoATexto(archivo);
 
-                    string nombreN = "compressed-REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt";
+                    string nombreN = "cifrada-CONV-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt";
 
                     CrearYGuardarArchivo(Ruta, nombreN, CodificarTransposicionSimple(contenido, clave));
-
-
-                    /*
-                    DirectoryInfo TempPath = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-                    TempPath = TempPath.Parent.Parent.Parent;
-                    string PathString = Convert.ToString(TempPath);
-                    string Route = System.IO.Path.Combine(PathString, "Files", "inputs", "REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
-                    string Route2 = System.IO.Path.Combine(PathString, "Files", "CartasCodificadas", "compressed-REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
-                    string FileData = System.IO.File.ReadAllText(Route);
-                    using (StreamWriter OutputFile = new StreamWriter(Route2))
-                    {
-                        OutputFile.WriteLine(CodificarTransposicionSimple(FileData,clave));//Message Coded save
-                    }
-                    */
-
-
 
                 }
                 catch (FileNotFoundException)
@@ -501,8 +591,6 @@ namespace LAB2_ED2.Controllers
                 NumCard++;
             }
         }
-
-
 
 
         public void SearchFilesToDecs(String DpiToSearch)
@@ -520,29 +608,14 @@ namespace LAB2_ED2.Controllers
                     TempPath = TempPath.Parent.Parent.Parent;
                     string PathString = Convert.ToString(TempPath);
 
-                    string archivo = System.IO.Path.Combine(PathString, "Files", "CartasCifradas", "compressed-REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
+                    string archivo = System.IO.Path.Combine(PathString, "Files", "CartasCifradas", "cifrada-CONV-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
 
                     contenido2 = LeerArchivoATexto(archivo);
 
-                    string nombreN2 = "Decode - REC - " + Convert.ToString(DpiToSearch) + " - " + Convert.ToString(NumCard) + ".txt";
+                    string nombreN2 = "decifradaCONV-" + Convert.ToString(DpiToSearch) + " - " + Convert.ToString(NumCard) + ".txt";
 
                     CrearYGuardarArchivo(Ruta2, nombreN2, DecodificarTransposicionSimple(contenido2, clave2));
 
-
-                    /*
-
-                    DirectoryInfo TempPath = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-                    TempPath = TempPath.Parent.Parent.Parent;
-                    string PathString = Convert.ToString(TempPath);
-                    string Route = System.IO.Path.Combine(PathString, "Files", "CartasCodificadas", "compressed-REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
-                    string Route2 = System.IO.Path.Combine(PathString, "Files", "CartasDecodificadas", "Decode-REC-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
-                    string FileData = System.IO.File.ReadAllText(Route);
-                    using (StreamWriter OutputFile = new StreamWriter(Route2))
-                    {
-                        OutputFile.WriteLine(DecodificarTransposicionSimple(FileData, clave2));
-                    }
-
-                    */
 
                 }
                 catch (FileNotFoundException)
@@ -558,11 +631,6 @@ namespace LAB2_ED2.Controllers
             }
 
         }
-
-
-
-
-
 
 
         static string CodificarTransposicionSimple(string texto, int clave)
@@ -598,12 +666,224 @@ namespace LAB2_ED2.Controllers
         }
 
 
-
         static string DecodificarTransposicionSimple(string textoCodificado, int clave)
         {
             // La decodificación es el proceso inverso de la codificación
             return CodificarTransposicionSimple(textoCodificado, -clave);
         }
+
+
+
+        //--------------------------------------------------------------------------------------
+
+        
+
+        public void Conversaciones(String DpiToSearch, BigInteger ClaveN, BigInteger ClaveK, BigInteger ClaveJ)
+        {
+            bool Cycle = true;
+            int NumCard = 1;
+            string contenido;
+
+            //string Ruta = @"C:\Users\hanse\Documents\2023\2023segundociclo\Esctructura de datos II\Laboratorio\Laboratorio1\LAB1ED2\LAB2_ED2-main\Files\inputsConv\";
+            string Ruta = @"C:\Users\hanse\Documents\2023\2023segundociclo\Esctructura de datos II\Laboratorio\Laboratorio1\LAB1ED2\LAB2_ED2-main\Files\Verificacion\";
+            string Ruta2 = @"C:\Users\hanse\Documents\2023\2023segundociclo\Esctructura de datos II\Laboratorio\Laboratorio1\LAB1ED2\LAB2_ED2-main\Files\HASHoriginal\";
+            while (Cycle == true)
+            {
+                try
+                {
+                    DirectoryInfo TempPath = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                    TempPath = TempPath.Parent.Parent.Parent;
+                    string PathString = Convert.ToString(TempPath);
+
+                    string archivo = System.IO.Path.Combine(PathString, "Files", "inputsConv", "CONV-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
+
+                    contenido = LeerArchivoATexto(archivo);
+
+                    //string HASHtxt = CalculateSHA256Hash(contenido);
+
+                    string FIRMA = contenido + "\n" + "\n" + Convert.ToString(FirmarMensaje(contenido, ClaveJ, ClaveN));
+
+
+                    string nombreN = "FIRMA-CONV-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt";
+
+                    string Hash = "HASH-CONV-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt";
+
+                    CrearYGuardarArchivo(Ruta, nombreN, FIRMA);
+                    CrearYGuardarArchivo(Ruta2, Hash, CalculateSHA256Hash(contenido));
+
+                }
+                catch (FileNotFoundException)
+                {
+                    Cycle = false;
+                }
+                catch (Exception e)
+                {
+                    Cycle = false;
+                }
+                NumCard++;
+            }
+        }
+
+        static RandomNumberGenerator rng = RandomNumberGenerator.Create();
+
+
+        static BigInteger GenerarNumeroPrimo(int numBits)
+        {
+            byte[] data = new byte[numBits / 8];
+            BigInteger numeroPrimo;
+
+            do
+            {
+                rng.GetBytes(data); // Genera bytes aleatorios
+                numeroPrimo = new BigInteger(data);
+                numeroPrimo = BigInteger.Abs(numeroPrimo); // Asegura que sea positivo
+
+            } while (!EsPrimo(numeroPrimo));
+
+            return numeroPrimo;
+        }
+
+
+        static bool EsPrimo(BigInteger numero)
+        {
+            if (numero <= 1)
+                return false;
+
+            if (numero <= 3)
+                return true;
+
+            if (numero.IsEven)
+                return false;
+
+            for (BigInteger i = 5; i * i <= numero; i += 6)
+            {
+                if (numero % i == 0 || numero % (i + 2) == 0)
+                    return false;
+            }
+
+            return true;
+        }
+
+
+        static BigInteger GenerarNumeroCoprimo(BigInteger baseNumber)
+        {
+            BigInteger numeroCoprimo;
+
+            do
+            {
+                numeroCoprimo = GenerarNumeroAleatorio(baseNumber);
+            } while (BigInteger.GreatestCommonDivisor(baseNumber, numeroCoprimo) != 1);
+
+            return numeroCoprimo;
+        }
+
+
+        static BigInteger GenerarNumeroAleatorio(BigInteger max)
+        {
+            byte[] bytes = new byte[max.ToByteArray().LongLength];
+            BigInteger numeroAleatorio;
+
+            do
+            {
+                rng.GetBytes(bytes); // Genera bytes aleatorios
+                numeroAleatorio = new BigInteger(bytes);
+                numeroAleatorio = BigInteger.Remainder(numeroAleatorio, max);
+
+            } while (numeroAleatorio <= 1);
+
+            return numeroAleatorio;
+        }
+
+
+        static BigInteger[] ExtEuclid(BigInteger a, BigInteger b)
+        {
+            if (b == BigInteger.Zero)
+            {
+                return new BigInteger[] { a, BigInteger.One, BigInteger.Zero };
+            }
+
+            BigInteger[] vals = ExtEuclid(b, a % b);
+            BigInteger d = vals[0];
+            BigInteger p = vals[2];
+            BigInteger q = vals[1] - (a / b) * vals[2];
+
+            return new BigInteger[] { d, p, q };
+        }
+
+
+        static BigInteger FirmarMensaje(string message, BigInteger jBytes, BigInteger nBytes)
+        {
+            // Calcular el resumen (hash) del mensaje usando SHA-256
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] messageBytes = Encoding.UTF8.GetBytes(message);
+                byte[] messageHash = sha256.ComputeHash(messageBytes);
+
+                // Convertir los valores de J y N de la clave privada a BigIntegers
+                BigInteger j = jBytes;
+                BigInteger n = nBytes;
+
+                // Convertir el resumen del mensaje a BigInteger
+                BigInteger messageHashBigInt = new BigInteger(messageHash);
+
+                // Firmar el resumen con la clave privada
+                BigInteger digitalSignature = BigInteger.ModPow(messageHashBigInt, j, n);
+
+                return digitalSignature;
+            }
+        }
+
+        //CIFRAR CON LLAVE PRIVADA, DECIFRAR CON LLAVE PUBLICA
+        static string CalculateSHA256Hash(string input)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                // Convertir el texto a bytes
+                byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+
+                // Calcular el hash
+                byte[] hashBytes = sha256.ComputeHash(inputBytes);
+
+                // Convertir el hash a una cadena hexadecimal
+                StringBuilder hashBuilder = new StringBuilder();
+                foreach (byte b in hashBytes)
+                {
+                    hashBuilder.Append(b.ToString("x2"));
+                }
+
+                return hashBuilder.ToString();
+            }
+        }
+
+        public void GuardarLLAVE(BigInteger N, BigInteger K, BigInteger J)
+        {
+            string llaveN, llaveK, llaveJ;
+
+            llaveN = Convert.ToString(N);
+
+            llaveK = Convert.ToString(K);
+
+            llaveJ = Convert.ToString(J);
+
+            string Ruta = @"C:\Users\hanse\Documents\2023\2023segundociclo\Esctructura de datos II\Laboratorio\Laboratorio1\LAB1ED2\LAB2_ED2-main\Files\Llaves\";
+
+
+            string publicaN = "publicaN.txt", publicaK = "publicaK.txt", privadaJ = "privadaJ.txt";
+
+            CrearYGuardarArchivo(Ruta, publicaN, llaveN);
+            CrearYGuardarArchivo(Ruta, publicaK, llaveK);
+            CrearYGuardarArchivo(Ruta, privadaJ, llaveJ);
+
+        }
+
+
+
+
+
+
+
+
+
 
 
 

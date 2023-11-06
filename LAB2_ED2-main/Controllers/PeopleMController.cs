@@ -225,12 +225,13 @@ namespace LAB2_ED2.Controllers
                             {                            
                                 AlgLZ78(DataJs);// Para codificar LZ78
 
-                                SearchFilesToCod(Convert.ToString(DataJs.dpi));// cifrar cartas
+                                //SearchFilesToCod(Convert.ToString(DataJs.dpi));// cifrar cartas
 
-                                SearchFilesToDecs(Convert.ToString(DataJs.dpi));// decifrar cartas
+                                //SearchFilesToDecs(Convert.ToString(DataJs.dpi));// decifrar cartas
 
-                                Conversaciones(Convert.ToString(DataJs.dpi), N, K, J);
+                                //Conversaciones(Convert.ToString(DataJs.dpi), N, K, J);
 
+                                //GuardarEmpresas(DataJs);
 
 
 
@@ -351,6 +352,10 @@ namespace LAB2_ED2.Controllers
             }
 
 
+
+
+            /*
+
             bool Cycle = true;
 
             int NumCard = 1;
@@ -367,7 +372,7 @@ namespace LAB2_ED2.Controllers
 
             string LLAVE2 = System.IO.Path.Combine(PathString2, "Files", "Llaves", "publicaK.txt");
 
-            string LLAVE3 = System.IO.Path.Combine(PathString2, "Files", "Llaves", "publicaJ.txt");
+            string LLAVE3 = System.IO.Path.Combine(PathString2, "Files", "Llaves", "privadaJ.txt");
 
             string N = LeerArchivoATexto(LLAVE1);
 
@@ -424,10 +429,6 @@ namespace LAB2_ED2.Controllers
 
                     }
 
-
-
-
-
                 }
                 catch (FileNotFoundException)
                 {
@@ -441,7 +442,7 @@ namespace LAB2_ED2.Controllers
             }
 
            
-
+            */
     
 
 
@@ -472,7 +473,7 @@ namespace LAB2_ED2.Controllers
                 else
                 {
                     LAB2_ED2.Models.Singleton.Instance.SearchedItem = UniqueResult;
-                    return RedirectToAction("ViewPeopleData");
+                    return RedirectToAction("ValidationPeople");
                 }
             }
         }
@@ -526,6 +527,30 @@ namespace LAB2_ED2.Controllers
             }
         }
 
+        public IActionResult ValidationPeople()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult ValidationPeople(IFormCollection IncomeData)
+        {
+            string contraseña;
+            contraseña = IncomeData["name"];
+
+
+            if (contraseña != "hola")
+            {
+                ViewBag.Message = "No se encontraron coincidencias.";
+                return View();
+            }
+            else
+            {
+
+                return RedirectToAction("ViewPeopleData");
+            }
+
+        }
 
 
         //--------------------------------------------------------------------------------------
@@ -867,7 +892,6 @@ namespace LAB2_ED2.Controllers
 
             string Ruta = @"C:\Users\hanse\Documents\2023\2023segundociclo\Esctructura de datos II\Laboratorio\Laboratorio1\LAB1ED2\LAB2_ED2-main\Files\Llaves\";
 
-
             string publicaN = "publicaN.txt", publicaK = "publicaK.txt", privadaJ = "privadaJ.txt";
 
             CrearYGuardarArchivo(Ruta, publicaN, llaveN);
@@ -879,6 +903,25 @@ namespace LAB2_ED2.Controllers
 
 
 
+        public void GuardarEmpresas(PeopleModel ObjTodec)
+        {
+
+            long dpi = ObjTodec.dpi;
+            string mensaje = "";
+
+            foreach (var Compani in ObjTodec.companies)
+            {
+                mensaje = mensaje + Compani[0];
+            }
+
+            mensaje = mensaje + Convert.ToString(dpi);
+
+            string nombre = Convert.ToString(dpi) + "_contraseña.txt";
+
+            string direccion = @"C:\Users\hanse\Documents\2023\2023segundociclo\Esctructura de datos II\Laboratorio\Laboratorio1\LAB1ED2\LAB2_ED2-main\Files\Contraseñas\";
+
+            CrearYGuardarArchivo(direccion, nombre, mensaje);
+        }
 
 
 

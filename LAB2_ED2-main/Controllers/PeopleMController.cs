@@ -190,7 +190,7 @@ namespace LAB2_ED2.Controllers
                     BigInteger[] result = ExtEuclid(K, Z);
 
                     //clave privada
-                    BigInteger J = result[0];
+                    BigInteger J = result[1];
 
                     GuardarLLAVE(N, K, J);
 
@@ -231,7 +231,11 @@ namespace LAB2_ED2.Controllers
 
                                 //Conversaciones(Convert.ToString(DataJs.dpi), N, K, J);
 
-                                //GuardarEmpresas(DataJs);
+                                //-----RSA: firma digital y cifrado
+
+                                //-----Para cifrado: llave publica para cifrar y llave privada para decifrar
+
+                                GuardarEmpresas(DataJs);
 
 
 
@@ -535,18 +539,23 @@ namespace LAB2_ED2.Controllers
         [HttpPost]
         public IActionResult ValidationPeople(IFormCollection IncomeData)
         {
-            string contraseña;
+            string contraseña, dpi, truePassword;
+
             contraseña = IncomeData["name"];
 
+            dpi = IncomeData["dpi"];
 
-            if (contraseña != "hola")
+            string archivo = @"C:\Users\hanse\Documents\2023\2023segundociclo\Esctructura de datos II\Laboratorio\Laboratorio1\LAB1ED2\LAB2_ED2-main\Files\Contraseñas\"+dpi + "_contraseña.txt";
+
+            truePassword = LeerArchivoATexto(archivo);
+
+            if (contraseña != truePassword)
             {
                 ViewBag.Message = "No se encontraron coincidencias.";
                 return View();
             }
             else
             {
-
                 return RedirectToAction("ViewPeopleData");
             }
 
@@ -722,6 +731,8 @@ namespace LAB2_ED2.Controllers
 
                     string archivo = System.IO.Path.Combine(PathString, "Files", "inputsConv", "CONV-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
 
+                    //string archivo = System.IO.Path.Combine(PathString, "Files", "inputsLAB5", "CONV-" + Convert.ToString(DpiToSearch) + "-" + Convert.ToString(NumCard) + ".txt");
+
                     contenido = LeerArchivoATexto(archivo);
 
                     //string HASHtxt = CalculateSHA256Hash(contenido);
@@ -793,7 +804,6 @@ namespace LAB2_ED2.Controllers
         static BigInteger GenerarNumeroCoprimo(BigInteger baseNumber)
         {
             BigInteger numeroCoprimo;
-
             do
             {
                 numeroCoprimo = GenerarNumeroAleatorio(baseNumber);
@@ -900,12 +910,8 @@ namespace LAB2_ED2.Controllers
 
         }
 
-
-
-
         public void GuardarEmpresas(PeopleModel ObjTodec)
         {
-
             long dpi = ObjTodec.dpi;
             string mensaje = "";
 
@@ -914,20 +920,21 @@ namespace LAB2_ED2.Controllers
                 mensaje = mensaje + Compani[0];
             }
 
-            mensaje = mensaje + Convert.ToString(dpi);
+            mensaje = mensaje + "_" + Convert.ToString(123);
 
             string nombre = Convert.ToString(dpi) + "_contraseña.txt";
 
             string direccion = @"C:\Users\hanse\Documents\2023\2023segundociclo\Esctructura de datos II\Laboratorio\Laboratorio1\LAB1ED2\LAB2_ED2-main\Files\Contraseñas\";
 
+
+
+
             CrearYGuardarArchivo(direccion, nombre, mensaje);
+
+
+
+
         }
-
-
-
-
-
-
 
 
 

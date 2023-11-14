@@ -21,6 +21,7 @@
     <Folder Include="Files\HASHoriginal\" />
     <Folder Include="Files\Llaves\" />
     <Folder Include="Files\Contraseñas\" />
+    <Folder Include="Files\ContraseñaCifrada\" />
     <Folder Include="Files\Validacion\" />
     <Folder Include="Files\Verificacion\" />
   </ItemGroup>
